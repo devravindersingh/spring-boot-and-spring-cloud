@@ -1,15 +1,11 @@
 package com.ravinder.student.app.service;
 
 import com.ravinder.student.app.entity.Student;
-import com.ravinder.student.app.feignClients.AddressFeignClient;
 import com.ravinder.student.app.repository.StudentRepository;
 import com.ravinder.student.app.request.CreateStudentRequest;
-import com.ravinder.student.app.response.AddressResponse;
 import com.ravinder.student.app.response.StudentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 @Service
 public class StudentService {
@@ -18,10 +14,7 @@ public class StudentService {
     StudentRepository studentRepository;
 
     @Autowired
-    WebClient webClient;
-
-    @Autowired
-    AddressFeignClient addressFeignClient;
+    CommonService commonService;
 
     public StudentResponse createStudent(CreateStudentRequest createStudentRequest) {
 
@@ -33,20 +26,22 @@ public class StudentService {
         student = studentRepository.save(student);
 
         StudentResponse studentResponse = new StudentResponse(student);
-//        studentResponse.setAddressResponse(getAddressById(student.getAddressId()));
-        studentResponse.setAddressResponse(addressFeignClient.getById(student.getAddressId()));
+        studentResponse.setAddressResponse(commonService.getAddressById(student.getAddressId()));
         return studentResponse;
     }
 
     public StudentResponse getById (long id) {
         Student student = studentRepository.findById(id).orElse(null);
         StudentResponse studentResponse = new StudentResponse(student);
-//        studentResponse.setAddressResponse(getAddressById(student.getAddressId()));
-        studentResponse.setAddressResponse(addressFeignClient.getById(student.getAddressId()));
-
+        studentResponse.setAddressResponse(commonService.getAddressById(student.getAddressId()));
         return studentResponse;
     }
 
+
+
+
+    
+//    using webclient webClient
 //    public AddressResponse getAddressById(long addressId){
 //        Mono<AddressResponse> addressResponse=
 //                webClient
